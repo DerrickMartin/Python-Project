@@ -1,46 +1,45 @@
-#Print Welcome Message
-print("Welcome to my quiz game")
+import requests
 
-# First question
-playing = input("Do you want to play? ")
+def get_weather(city, api_key):
+    base_url = "http://api.openweathermap.org/data/2.5/weather"
+    params = {
+        "q": city,
+        "appid": api_key,
+        "units": "metric"
+    }
 
-if playing.lower() != "yes":
-    quit()
+    response = requests.get(base_url, params=params)
+    weather_data = response.json()
 
-print("Okay! Let's play :)")
-score = 0
+    if response.status_code == 200:
+        if "weather" in weather_data and len(weather_data["weather"]) > 0:
+            main_weather = weather_data["weather"][0].get("main")
+            description = weather_data["weather"][0].get("description")
+        else:
+            print("Weather data not available.")
+            return
 
-#First Question
-answer = input("What animal is a mans best friend? ")
-if answer.lower() == "dog":
-    print('Correct!')
-    score += 1
-else:
-    print("Incorrect!")
-# Second Question
-answer = input("How do you spell the color red? ")
-if answer.lower() == "red":
-    print('Correct!')
-    score += 1
-else:
-    print("Incorrect!")
+        temperature = weather_data.get("main", {}).get("temp")
+        humidity = weather_data.get("main", {}).get("humidity")
+        wind_speed = weather_data.get("wind", {}).get("speed")
 
-# Third Question
-answer = input("What color is the sky? ")
-if answer.lower() == "blue":
-    print('Correct!')
-    score += 1
-else:
-    print("Incorrect!")
+        print(f"Weather in {city}:")
+        if main_weather:
+            print(f"Main Weather: {main_weather}")
+        if description:
+            print(f"Description: {description}")
+        if temperature:
+            print(f"Temperature: {temperature}°C")
+        if humidity:
+            print(f"Humidity: {humidity}%")
+        if wind_speed:
+            print(f"Wind Speed: {wind_speed} m/s")
+    else:
+        print("City not found or API error.")
 
-# Fourth Question
-answer = input("What anime has over 1000 episodes ")
-if answer.lower() == "one piece":
-    print('Correct!')
-    score += 1
-else:
-    print("Incorrect!")
 
-# Print the Score
-print("You got " + str(score) + " questions correct!")
-print("You got " + str((score / 4) * 100) + "%.")
+# Replace 'YOUR_API_KEY' with your actual API key from OpenWeatherMap
+api_key = "51eb64e2014e322cf1d8f73d02db2f24"
+
+city = input("Enter a city name: ")
+get_weather(city, api_key)
